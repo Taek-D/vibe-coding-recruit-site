@@ -55,12 +55,13 @@ export function ApplicationForm({ jobTitle, jobId = 'default', jobCategory, onSu
         setIsSubmitting(true);
 
         try {
-            // 1. 파일명 생성 (타임스탬프 + 이름)
+            // 1. 파일명 생성 (타임스탬프만 사용 - URL-safe)
             const timestamp = Date.now();
-            const sanitizedName = formData.name.replace(/[^a-zA-Z0-9가-힣]/g, '_');
+            // 영문자와 숫자만 허용 (한글 제거)
+            const sanitizedName = formData.name.replace(/[^a-zA-Z0-9]/g, '') || 'applicant';
 
             // 2. 이력서 업로드 (필수)
-            const resumeExt = formData.resume.name.split('.').pop();
+            const resumeExt = formData.resume.name.split('.').pop()?.toLowerCase() || 'pdf';
             const resumePath = `${jobId}/${timestamp}_${sanitizedName}_resume.${resumeExt}`;
             const { path: uploadedResumePath, error: resumeError } = await uploadFile(
                 formData.resume,
@@ -76,7 +77,7 @@ export function ApplicationForm({ jobTitle, jobId = 'default', jobCategory, onSu
             // 3. 포트폴리오 업로드 (선택)
             let uploadedPortfolioPath: string | null = null;
             if (formData.portfolio) {
-                const portfolioExt = formData.portfolio.name.split('.').pop();
+                const portfolioExt = formData.portfolio.name.split('.').pop()?.toLowerCase() || 'pdf';
                 const portfolioPath = `${jobId}/${timestamp}_${sanitizedName}_portfolio.${portfolioExt}`;
                 const { path, error: portfolioError } = await uploadFile(
                     formData.portfolio,
