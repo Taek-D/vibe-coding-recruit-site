@@ -67,11 +67,24 @@ DROP POLICY IF EXISTS "Allow anonymous insert" ON public.applications;
 DROP POLICY IF EXISTS "Deny all select" ON public.applications;
 
 -- INSERT 정책: 익명 사용자(anon)가 지원서 제출 가능
+-- 최소한의 형식/길이 검증을 통과한 데이터만 허용
 CREATE POLICY "Allow anonymous insert"
 ON public.applications
 FOR INSERT
 TO anon
-WITH CHECK (true);
+WITH CHECK (
+    char_length(job_id) BETWEEN 1 AND 50
+    AND char_length(job_title) BETWEEN 1 AND 200
+    AND char_length(name) BETWEEN 1 AND 100
+    AND email ~* '^[A-Z0-9._%+-]+@[A-Z0-9.-]+[.][A-Z]{2,}$'
+    AND phone ~ '^[0-9+() -]{8,20}$'
+    AND resume_path ~ '^[A-Za-z0-9_-]{1,50}/[0-9]{13}_[A-Za-z0-9]+_resume[.](pdf|doc|docx)$'
+    AND (
+        portfolio_path IS NULL
+        OR portfolio_path ~ '^[A-Za-z0-9_-]{1,50}/[0-9]{13}_[A-Za-z0-9]+_portfolio[.](pdf|zip|pptx)$'
+    )
+    AND (cover_letter IS NULL OR char_length(cover_letter) <= 2000)
+);
 
 -- SELECT 정책: 기본적으로 모든 조회 차단 (관리자만 조회 가능하도록)
 -- 관리자 조회가 필요한 경우, 별도로 authenticated 사용자를 위한 정책 추가 필요
@@ -97,11 +110,17 @@ DROP POLICY IF EXISTS "Allow anonymous upload" ON storage.objects;
 DROP POLICY IF EXISTS "Deny all select on storage" ON storage.objects;
 
 -- Storage INSERT 정책: 익명 사용자가 applications 버킷에 업로드 가능
+-- 버킷/경로/확장자 규칙을 모두 만족해야 업로드 허용
 CREATE POLICY "Allow anonymous upload"
 ON storage.objects
 FOR INSERT
 TO anon
-WITH CHECK (bucket_id = 'applications');
+WITH CHECK (
+    bucket_id = 'applications'
+    AND (storage.foldername(name))[1] ~ '^[A-Za-z0-9_-]{1,50}$'
+    AND name ~ '^[A-Za-z0-9_-]{1,50}/[0-9]{13}_[A-Za-z0-9]+_(resume|portfolio)[.](pdf|doc|docx|zip|pptx)$'
+    AND storage.extension(name) = ANY (ARRAY['pdf', 'doc', 'docx', 'zip', 'pptx'])
+);
 
 -- Storage SELECT 정책: 기본적으로 조회 차단
 CREATE POLICY "Deny all select on storage"

@@ -7,7 +7,6 @@ import { JOBS } from "@/lib/mock-data";
 import { Button } from "@/components/ui/Button";
 
 // Unique values for filters
-const CAREER_OPTIONS = ["신입", "경력", "무관"];
 const TYPE_OPTIONS = ["정규직", "계약직", "인턴"];
 // Category maps to id: dev, design, etc.
 const CATEGORY_MAP: Record<string, string> = {

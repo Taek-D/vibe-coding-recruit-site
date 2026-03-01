@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Section } from "@/components/ui/Section";
-import { Card } from "@/components/ui/Card";
 import { CultureCard } from "@/components/ui/CultureCard";
 import { CULTURE } from "@/lib/mock-data";
 
@@ -24,7 +23,7 @@ export default function AboutPage() {
                 <p className="text-xl md:text-2xl text-grey-700 max-w-3xl mx-auto leading-relaxed mb-12 text-pretty">
                     은행 앱을 켤 때마다 느껴지던 막막함을 기억하시나요?<br />
                     어려운 용어, 복잡한 절차, 불필요한 공인인증서.<br />
-                    AIO는 이 모든 '금융의 장벽'을 기술로 허물고,<br />
+                    AIO는 이 모든 &lsquo;금융의 장벽&rsquo;을 기술로 허물고,<br />
                     누구나 직관적으로 내 돈을 관리하는 세상을 만듭니다.
                 </p>
             </Section>
@@ -63,7 +62,7 @@ export default function AboutPage() {
                         <div className="relative">
                             <span className="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-brand-blue ring-4 ring-white" />
                             <h3 className="text-xl font-bold mb-2">Product & Design</h3>
-                            <p className="text-grey-700">"이게 정말 사용자에게 최선인가요?"를 끊임없이 묻습니다. 예쁜 화면이 아니라 문제 해결을 위한 인터페이스를 설계합니다.</p>
+                            <p className="text-grey-700">&quot;이게 정말 사용자에게 최선인가요?&quot;를 끊임없이 묻습니다. 예쁜 화면이 아니라 문제 해결을 위한 인터페이스를 설계합니다.</p>
                         </div>
                         <div className="relative">
                             <span className="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-grey-300 ring-4 ring-white" />

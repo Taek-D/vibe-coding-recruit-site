@@ -26,7 +26,6 @@ export default async function ApplyPage({ params }: Props) {
             <ApplicationForm
                 jobTitle={job.title}
                 jobId={job.id}
-                jobCategory={job.category}
             />
         </div>
     );

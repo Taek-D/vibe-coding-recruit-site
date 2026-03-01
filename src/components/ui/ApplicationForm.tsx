@@ -3,12 +3,11 @@
 import { useState, FormEvent } from "react";
 import { Button } from "@/components/ui/Button";
 import { useRouter } from "next/navigation";
-import { uploadFile, submitApplication } from "@/lib/supabase";
+import { deleteFiles, uploadFile, submitApplication } from "@/lib/supabase";
 
 interface ApplicationFormProps {
     jobTitle: string;
     jobId?: string;
-    jobCategory?: string;
     onSuccess?: () => void;
     onCancel?: () => void;
 }
@@ -23,7 +22,7 @@ const REFERRAL_SOURCES = [
     "기타"
 ];
 
-export function ApplicationForm({ jobTitle, jobId = 'default', jobCategory, onSuccess, onCancel }: ApplicationFormProps) {
+export function ApplicationForm({ jobTitle, jobId = 'default', onSuccess, onCancel }: ApplicationFormProps) {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
@@ -37,6 +36,16 @@ export function ApplicationForm({ jobTitle, jobId = 'default', jobCategory, onSu
         referralSource: "",
         agreePrivacy: false,
     });
+
+    const cleanupUploadedFiles = async (paths: Array<string | null | undefined>) => {
+        const validPaths = paths.filter((path): path is string => !!path);
+        if (validPaths.length === 0) return;
+
+        const { error } = await deleteFiles(validPaths);
+        if (error) {
+            console.error('Uploaded file cleanup failed:', error);
+        }
+    };
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -53,6 +62,8 @@ export function ApplicationForm({ jobTitle, jobId = 'default', jobCategory, onSu
         }
 
         setIsSubmitting(true);
+        let uploadedResumePath: string | null = null;
+        let uploadedPortfolioPath: string | null = null;
 
         try {
             // 1. 파일명 생성 (타임스탬프만 사용 - URL-safe)
@@ -62,10 +73,10 @@ export function ApplicationForm({ jobTitle, jobId = 'default', jobCategory, onSu
 
             // 2. 이력서 업로드 (필수)
             const resumeExt = formData.resume.name.split('.').pop()?.toLowerCase() || 'pdf';
-            const resumePath = `${jobId}/${timestamp}_${sanitizedName}_resume.${resumeExt}`;
-            const { path: uploadedResumePath, error: resumeError } = await uploadFile(
+            const resumeFilePath = `${jobId}/${timestamp}_${sanitizedName}_resume.${resumeExt}`;
+            const { path: resumePath, error: resumeError } = await uploadFile(
                 formData.resume,
-                resumePath
+                resumeFilePath
             );
 
             if (resumeError) {
@@ -73,9 +84,9 @@ export function ApplicationForm({ jobTitle, jobId = 'default', jobCategory, onSu
                 setIsSubmitting(false);
                 return;
             }
+            uploadedResumePath = resumePath;
 
             // 3. 포트폴리오 업로드 (선택)
-            let uploadedPortfolioPath: string | null = null;
             if (formData.portfolio) {
                 const portfolioExt = formData.portfolio.name.split('.').pop()?.toLowerCase() || 'pdf';
                 const portfolioPath = `${jobId}/${timestamp}_${sanitizedName}_portfolio.${portfolioExt}`;
@@ -85,6 +96,7 @@ export function ApplicationForm({ jobTitle, jobId = 'default', jobCategory, onSu
                 );
 
                 if (portfolioError) {
+                    await cleanupUploadedFiles([uploadedResumePath]);
                     alert(`포트폴리오 업로드 실패: ${portfolioError.message}`);
                     setIsSubmitting(false);
                     return;
@@ -94,7 +106,7 @@ export function ApplicationForm({ jobTitle, jobId = 'default', jobCategory, onSu
             }
 
             // 4. DB에 지원 정보 저장
-            const { data, error: dbError } = await submitApplication({
+            const { error: dbError } = await submitApplication({
                 job_id: jobId,
                 job_title: jobTitle,
                 name: formData.name,
@@ -107,19 +119,25 @@ export function ApplicationForm({ jobTitle, jobId = 'default', jobCategory, onSu
             });
 
             if (dbError) {
+                await cleanupUploadedFiles([uploadedResumePath, uploadedPortfolioPath]);
                 alert(`지원서 제출 실패: ${dbError.message}\n\n브라우저 콘솔을 확인해주세요.`);
                 setIsSubmitting(false);
                 return;
             }
 
             // 5. 성공
-            console.log('Application submitted successfully:', data);
+            console.log('Application submitted successfully');
             setIsSubmitting(false);
-            setIsSuccess(true);
+            if (onSuccess) {
+                onSuccess();
+                return;
+            }
 
+            setIsSuccess(true);
             // Scroll to top to show success message
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (err) {
+            await cleanupUploadedFiles([uploadedResumePath, uploadedPortfolioPath]);
             console.error('Unexpected error during submission:', err);
             alert(`예상치 못한 오류가 발생했습니다: ${err instanceof Error ? err.message : '알 수 없는 오류'}`);
             setIsSubmitting(false);
@@ -137,6 +155,10 @@ export function ApplicationForm({ jobTitle, jobId = 'default', jobCategory, onSu
     };
 
     const handleBack = () => {
+        if (onCancel) {
+            onCancel();
+            return;
+        }
         router.back();
     };
 

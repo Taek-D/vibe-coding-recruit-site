@@ -2,8 +2,6 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { JOBS, STORIES } from "@/lib/mock-data";
 
 interface SearchOverlayProps {
@@ -121,7 +119,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                                                     <img src={story.image} alt={story.name} className="w-full h-full object-cover" />
                                                 </div>
                                                 <div>
-                                                    <div className="font-bold text-grey-900 group-hover:text-brand-blue">"{story.quote}"</div>
+                                                    <div className="font-bold text-grey-900 group-hover:text-brand-blue">&quot;{story.quote}&quot;</div>
                                                     <div className="text-sm text-grey-500">{story.name} · {story.role}</div>
                                                 </div>
                                             </div>

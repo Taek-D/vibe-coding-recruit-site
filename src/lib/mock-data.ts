@@ -860,19 +860,9 @@ export const CATEGORY_INFO: Record<string, { title: string; desc: string }> = {
     culture: { title: "문화", desc: "자율과 책임, 그리고 성장을 지향하는 AIO의 일하는 방식입니다." },
 };
 
-// Helper to get job by ID with fallback
+// Helper to get job by ID
 export function getJobById(id: string): Job | undefined {
-    const job = JOBS.find(j => j.id === id);
-    if (job) return job;
-
-    // Fallback for other IDs to avoid empty pages in demo (returns a minimal Job)
-    return {
-        ...JOBS[0],
-        id,
-        title: "Software Engineer (예시)",
-        description: "이 공고는 데모용 예시 데이터입니다.",
-        process: ["서류 전형", "면접", "처우 협의"]
-    };
+    return JOBS.find(j => j.id === id);
 }
 
 export function getStoryById(id: string): Story | undefined {

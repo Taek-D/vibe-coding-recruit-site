@@ -48,7 +48,7 @@ export default async function StoryDetailPage({ params }: Props) {
                         ))}
                     </div>
                     <h1 className="text-3xl md:text-5xl font-bold mb-8 leading-tight text-white word-keep">
-                        "{story.title}"
+                        &quot;{story.title}&quot;
                     </h1>
 
                     <div className="flex items-center justify-center gap-4 text-sm md:text-base font-medium text-grey-300">

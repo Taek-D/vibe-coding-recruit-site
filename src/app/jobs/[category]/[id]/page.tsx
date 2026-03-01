@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
-import { Section } from "@/components/ui/Section";
 import { Card } from "@/components/ui/Card";
 import { StoryCard } from "@/components/ui/StoryCard";
 import { getJobById, STORIES, CATEGORY_INFO } from "@/lib/mock-data";
@@ -24,6 +23,7 @@ export default async function JobDetailPage({ params }: Props) {
     const job = getJobById(id);
 
     if (!job) notFound();
+    if (job.category !== category) notFound();
 
     // Related Stories (Just take first 2 for demo)
     // Map relatedStoryIds to actual Story objects

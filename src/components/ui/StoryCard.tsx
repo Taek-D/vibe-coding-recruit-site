@@ -11,7 +11,7 @@ interface StoryCardProps {
     category: string;
 }
 
-export function StoryCard({ id, name, role, quote, image, category }: StoryCardProps) {
+export function StoryCard({ id, name, role, quote, category }: StoryCardProps) {
     return (
         <Link href={`/stories/${id}`}>
             <Card className="flex flex-col p-0 overflow-hidden h-full group hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
@@ -19,7 +19,7 @@ export function StoryCard({ id, name, role, quote, image, category }: StoryCardP
                     <StoryCover category={category} />
                 </div>
                 <div className="p-6 flex flex-col flex-1">
-                    <p className="text-lg font-medium text-grey-900 italic mb-4 flex-1">"{quote}"</p>
+                    <p className="text-lg font-medium text-grey-900 italic mb-4 flex-1">&quot;{quote}&quot;</p>
                     <div>
                         <p className="font-bold text-grey-900">{name}</p>
                         <p className="text-sm text-grey-500">{role}</p>

@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/Card";
 import { Story } from "@/lib/mock-data";
 import { StoryCover } from "@/components/ui/StoryCover";
 
-export function StoryListCard({ id, title, lead, image, tags, date, readTime, role, name, category }: Story) {
+export function StoryListCard({ id, title, lead, tags, date, readTime, role, name, category }: Story) {
     return (
         <Link href={`/stories/${id}`} className="block h-full">
             <Card className="h-full p-0 overflow-hidden hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex flex-col group">

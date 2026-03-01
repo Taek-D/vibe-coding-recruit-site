@@ -15,7 +15,7 @@ const getCoverType = (id: string): 'remote' | 'workshop' | 'education' => {
     return 'education';
 };
 
-export function CultureCard({ id, title, desc, image }: CultureCardProps) {
+export function CultureCard({ id, title, desc }: CultureCardProps) {
     return (
         <Link href={`/about`}>
             {/* Usually points to a specific culture post or anchor, for MVP linking to About */}
